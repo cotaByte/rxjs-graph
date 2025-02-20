@@ -1,1 +1,22 @@
-<p>component-test works!</p>
+@let merged= merged$|async; @let combined= combinedLatest$|async;
+
+<div class="button-container">
+  <button (click)="this.a.next('A')">Emit A</button>
+  <button (click)="this.b.next('B')">Emit B</button>
+  <button (click)="this.c.next('C')">Emit C</button>
+  <button (click)="this.d.next('D')">Emit D</button>
+</div>
+<br />
+<br />
+<div>
+  The final emision was
+  <span class="selected">
+    {{ merged }}
+  </span>
+</div>
+<div>
+  The whole emissions combined were was
+  <span class="selected">
+    {{ combined }}
+  </span>
+</div>

@@ -1,0 +1,25 @@
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  button {
+    margin: 0 10px;
+    background-color: #c0008f;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #f80090;
+    transition: background-color 0.5s ease-in-out;
+  }
+}
+.selected {
+  color: #f80090;
+  font-size: 2rem;
+  font-weight: 700;
+}
