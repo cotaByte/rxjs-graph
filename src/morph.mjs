@@ -1,28 +1,26 @@
 import { Project } from 'ts-morph';
 
 const project = new Project({});
-
-// Agrega el archivo al proyecto
-project.addSourceFileAtPath(
-  './app/features/component-test/component-test.component.ts'
-);
+project.addSourceFilesAtPaths('../src/**/*.ts');
 
 const componentTestFile = project.getSourceFile(
-  './app/features/component-test/component-test.component.ts'
+  './app/features/hardcore-component-test/hardcore-component-test.component.ts'
 );
 
 const klass = componentTestFile?.getClasses()[0];
+console.log(klass.getProperties().map((prop) => prop.getName()));
 
 const props = klass.getProperties().map((prop) => ({
   name: prop.getName(),
   type: prop.getType().getText().split('.')[1],
-  content: prop
+  linesContent: prop
     .getText()
+    .trim()
     .split('=')
     .slice(1)
-    .join('=')
-    .replaceAll('\n', '')
-    .replaceAll('  ', ''),
+    .join('')
+    .replaceAll('  ', '')
+    .split('\n'),
 }));
 
 console.log(props);

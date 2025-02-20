@@ -1,3 +1,4 @@
 .angular
 node_modules
 dist
+src/app/features/component-test/hardcore-test.component.ts
