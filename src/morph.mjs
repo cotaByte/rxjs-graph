@@ -1,26 +1,41 @@
-import { Project } from 'ts-morph';
+import { Project, SourceFile, SyntaxKind } from 'ts-morph';
 
 const project = new Project({});
 project.addSourceFilesAtPaths('../src/**/*.ts');
 
 const componentTestFile = project.getSourceFile(
-  './app/features/hardcore-component-test/hardcore-component-test.component.ts'
+  './app/features/component-test/hardcore-test.component.ts'
 );
 
 const klass = componentTestFile?.getClasses()[0];
-console.log(klass.getProperties().map((prop) => prop.getName()));
 
-const props = klass.getProperties().map((prop) => ({
-  name: prop.getName(),
-  type: prop.getType().getText().split('.')[1],
-  linesContent: prop
+const rxjsProps = klass.getProperties().filter((prop) =>
+  prop
+    .getType()
     .getText()
-    .trim()
-    .split('=')
-    .slice(1)
-    .join('')
-    .replaceAll('  ', '')
-    .split('\n'),
-}));
+    .match(/\/node_modules\/rxjs\//)
+);
 
-console.log(props);
+const metaProps = rxjsProps
+  .filter((prop) => prop.getType().getText().includes('rxjs'))
+  .map((prop) => ({
+    name: prop.getName(),
+    type: prop.getType().getText().split('.')[1],
+    linesContent: prop
+      .getText()
+      .trim()
+      .split('=')
+      .slice(1)
+      .join('')
+      .replaceAll('  ', '')
+      .split('\n'),
+    prop,
+  }));
+
+// console.log(metaProps.map((prop) => prop.name));
+
+const test = metaProps[15].prop;
+
+const leftItemOperator = test.getChildren()[2];
+
+console.dir(leftItemOperator, { depth: null, colors: true });
