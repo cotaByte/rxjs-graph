@@ -1,59 +1,27 @@
 # RxjsGraph
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
+Hay dos tipos de observables de combinacion ( que son los que nos importan a la
+hora de saber como se conectan los observables entre si)
 
-## Development server
+## Combinadores en serie (Funnel)
 
-To start a local development server, run:
+Construyen a partir de la emision de varios observables, una sola emisión.
+Es decir, este tipo de combinacion hace que converjan las fuentes.
 
-```bash
-ng serve
+```
+merge mergeWith concat race
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Combinadores en paralelo (Sync)
 
-## Code scaffolding
+Combinan las fuentes, pero aunque convergan, se lanza un emision cada vez que una de ellas emita, con todas las demás, combinan en paralelo
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+combineLatest, WithLatestFrom, switchMap,
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+# Idea del grafo
 
-```bash
-ng generate --help
-```
+![Descripción de la imagen](src/assets/example_img/example-graph-1.jpeg)
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Realmente lo importante del grafo, es saber el nombre de los observables que combinandose, forman esa cadena.
