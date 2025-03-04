@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
   combineLatest,
@@ -11,7 +11,7 @@ import {
 
 @Component({
   selector: 'component-test',
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, CommonModule],
   templateUrl: './component-test.component.html',
   styleUrl: './component-test.component.scss',
 })
