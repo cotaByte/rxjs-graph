@@ -1,34 +1,27 @@
 import { Project, SyntaxKind } from 'ts-morph';
 
 const rxjsRegExp = {
-  merge: { reg: /merge\(/, extract: (node) => extractSourcesFormMerge(node) },
+  merge: { reg: /merge/ },
   mergeMap: {
-    reg: /mergeMap\(/,
-    extract: (node) => extractSourcesFromMergeMap(node),
+    reg: /mergeMap/,
   },
   mergeWith: {
-    reg: /mergeWith\(/,
-    extract: (node) => extractSourcesFromMergeWith(node),
+    reg: /mergeWith/,
   },
   switchMap: {
-    reg: /switchMap\(/,
-    extract: (node) => extractSourcesFromSwitchMap(node),
+    reg: /switchMap/,
   },
   withLatestFrom: {
-    reg: /withLatestFrom\(/,
-    extract: (node) => extractSourcesFromwithLatestFrom(node),
+    reg: /withLatestFrom/,
   },
   combineLatest: {
-    reg: /combineLatest\(/,
-    extract: (node) => extractSourcesFromCombineLatest(node),
+    reg: /combineLatest/,
   },
   combineLatestWith: {
-    reg: /combineLatestWith\(/,
-    extract: (node) => extractSourcesFromCombineLatestWith(node),
+    reg: /combineLatestWith/,
   },
   forkJoin: {
-    reg: /forkJoin\(/,
-    extract: (node) => extractSourcesFromForkJoin(node),
+    reg: /forkJoin/,
   },
 };
 
@@ -39,13 +32,19 @@ const componentTestFile = project.getSourceFile(
 );
 
 const klass = componentTestFile?.getClasses()[0];
-
 const rxjsProps = klass.getProperties().filter((prop) =>
   prop
     .getType()
     .getText()
     .match(/\/node_modules\/rxjs\//)
 );
+const rxjsPropsNames = rxjsProps.map((prop) => prop.getName());
+
+console.log('Class RXJS declarations');
+console.log('============================================');
+console.log(rxjsPropsNames);
+console.log('============================================');
+console.log('                                            ');
 
 const metaProps = rxjsProps
   .filter((prop) => prop.getType().getText().includes('rxjs'))
@@ -66,128 +65,65 @@ const metaProps = rxjsProps
 const test = metaProps[15].prop.getChildren()[2];
 
 //regexp approach
-// getCombinationSourcesDeclarations(test);
-
 printAllChildren(test);
-
-//#region regexp approach
-function getCombinationSourcesDeclarations(node, depth = 0) {
-  /**
-   * Regexp for rxjs combinatory operators
-   */
-
-  if (
-    node.getKindName() === 'CallExpression' &&
-    Object.values(rxjsRegExp).some(({ reg }) => reg.test(node.getText()))
-  ) {
-    console.log('========================================================');
-    const matchedCombination = Object.entries(rxjsRegExp).find(([key]) =>
-      rxjsRegExp[key].reg.test(node.getText())
-    );
-
-    const sources = matchedCombination[1].extract(node.getText());
-
-    console.log(
-      `Founded ${
-        matchedCombination[0]
-      } at depth ${depth} ==> ${node.getKindName()}`
-    );
-    console.log(`Sources: [${sources}]`);
-    console.log('========================================================\n');
-  }
-
-  node.forEachChild((child) => {
-    getCombinationSourcesDeclarations(child, depth + 1);
-  });
-}
-
-//#region EXTRACT SOURCES
-function extractSourcesFromMergeMap(string) {
-  const regexp = /mergeMap\(\s*([\s\S]*?)\s*\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFromSwitchMap(string) {
-  const regexp = /switchMap\(\s*([\s\S]*?)\s*\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFromForkJoin(string) {
-  const regexp = /forkJoin\(\[\s*([\s\S]*?)\s*\]\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFromCombineLatest(string) {
-  const regexp = /combineLatest\(\[\s*([\s\S]*?)\s*\]\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFromMergeWith(string) {
-  const regexp = /mergeWith\(\s*([\s\S]*?)\s*\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFromCombineLatestWith(string) {
-  const regexp = /combineLatestWith\(\s*([\s\S]*?)\s*\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFromwithLatestFrom(string) {
-  const regexp = /withLatestFrom\(\s*([\s\S]*?)\s*\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-
-function extractSourcesFormMerge(string) {
-  const regexp = /merge\(\s*([\s\S]*?)\s*\)/;
-  const match = string.match(regexp);
-
-  return match ? extractSources(match) : [];
-}
-//#endregion EXTRACT SOURCES
-
-function extractSources(match) {
-  const regexp = /this\.\$?(\w+\$?)/g;
-  const sources = [];
-  let source;
-  while ((source = regexp.exec(match[1])) !== null) {
-    sources.push(source[1]);
-  }
-  return sources;
-}
-
-//#endregion regexp approach
 
 //#region TS MOPRH APPROACH
 function printAllChildren(node, depth = 0) {
-  if (!syntaxKindToName(node.getKind()) === 'CallExpression') return;
-
   const nodeText = node.getText();
-  const hasRxjsProp = rxjsProps.some((prop) =>
-    nodeText.includes(prop.getName())
-  );
+  const syntaxKindToSee = ['Identifier'];
+  if (syntaxKindToSee.includes(node.getKindName())) {
+    console.log('========================================================');
+    console.log(' '.repeat(depth));
 
-  if (!hasRxjsProp) return;
+    console.log(
+      `Node found at depth ${depth}: NodeType: ${syntaxKindToName(
+        node.getKind()
+      )}  => ${nodeText}`
+    );
+  }
+  depth;
 
-  console.log(nodeText);
-
-  depth++;
-  node.getChildren().forEach((c) => printAllChildren(c, depth));
+  node.getChildren().forEach((c) => printAllChildren(c, depth++));
 }
 function syntaxKindToName(kind) {
   return SyntaxKind[kind];
+}
+
+function isRxjsCombinatorDeclaration(node) {
+  return Object.values(rxjsRegExp).some(({ reg }) => reg.test(node.getText()));
+}
+
+function isObservableDeclaration(node) {
+  return rxjsPropsNames.some((prop) => node.getText().startsWith(prop));
+}
+
+function mayBeAObservable(node) {
+  const creationOperators = [
+    'ajax',
+    'bindCallback',
+    'bindNodeCallback',
+    'defer',
+    'empty',
+    'from',
+    'fromEvent',
+    'fromEventPattern',
+    'generate',
+    'interval',
+    'of',
+    'range',
+    'throwError',
+    'timer',
+    'iif',
+  ];
+
+  return creationOperators.some((op) => node.getText().startsWith(op));
+}
+
+function mayBeAObservableFromService(node) {
+  //todo: must be a better way of do this
+  return node
+    .getText()
+    .toString()
+    .match(/^this\.[^.]*[sS]ervice\.[^.]*/gm);
 }
 //#endregion TS MOPRH APPROACH
